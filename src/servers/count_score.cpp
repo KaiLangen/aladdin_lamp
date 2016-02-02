@@ -21,6 +21,7 @@ class Pools {
     }
 
     int sum_capacity (int deleted_row) {
+        return accumulate(rows.begin(), rows.end(), 0) - rows
         vector<int>::iterator it = rows.begin();
         advance(it, deleted_row);
         int ret = 0;

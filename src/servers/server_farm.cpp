@@ -9,10 +9,10 @@ ServerFarm::ServerFarm(std::string filename){
 	std::ifstream myfile(filename.c_str());
 	if(myfile.is_open()){
 		myfile >> nrows_;
-		myfile >> ncols_;
+		myfile >> nslots_;
 		matrix_.resize(nrows_);
 		for(size_t i = 0; i < nrows_; ++i){
-			matrix_[i].resize(ncols_);
+			matrix_[i].resize(nslots_);
 		}
 		myfile >> nunavaiable_;
 		myfile >> npools_;
@@ -51,7 +51,7 @@ void ServerFarm::add_server(){
 	servers_.pop();
 	size_t consecutive = 0;
 	for(size_t i = 0; i < nrows_; ++i){
-		for(size_t j = 0; j < ncols_; ++j){
+		for(size_t j = 0; j < nslots_; ++j){
 			if(matrix_[i][j] == 0)
 				++consecutive;
 
@@ -70,7 +70,7 @@ void ServerFarm::add_server(){
 
 void ServerFarm::print(std::ostream &out) const{
 	for(size_t i = 0; i < nrows_; ++i){
-		for(size_t j = 0; j < ncols_; ++j){
+		for(size_t j = 0; j < nslots_; ++j){
 			out<<matrix_[i][j]<<"\t";
 		}
 		out<<std::endl;

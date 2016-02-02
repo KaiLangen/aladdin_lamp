@@ -40,11 +40,13 @@ private:
 	std::vector<std::vector<int> > matrix_;
 
 	size_t nrows_;
-	size_t ncols_;
+	size_t nslots_;
 	size_t npools_;
 	size_t nunavaiable_;
 	size_t nservers_;
 
+    double avg_cperpr_; // capacity/(pools*rows)
+    double 
 public:
 	std::priority_queue<Server, std::vector<Server>, cap_less> servers_;
     std::vector <Server> servers_v_;

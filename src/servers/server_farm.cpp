@@ -1,5 +1,9 @@
 #include "server_farm.h"
 
+void Server::print(std::ostream &out) const{
+	out<<id_<<" " << width_ << " " << cap_ << " " << dens_ << std::endl;
+}
+
 ServerFarm::ServerFarm(std::string filename){
 	std::string line;
 	std::ifstream myfile(filename.c_str());
@@ -20,12 +24,16 @@ ServerFarm::ServerFarm(std::string filename){
 			matrix_[x][y] = -1;
 		}
 
+        servers_v_.resize(nservers_);
 		for(size_t i = 0; i < nservers_; ++i){
 			Server newServer;
 			myfile >> newServer.width_;
 			myfile >> newServer.cap_;
-			std::cout<<newServer.width_<<" "<<newServer.cap_<<std::endl;
+            newServer.id_ = i;
+            newServer.dens_ = newServer.cap_ * 1.0 / newServer.width_;
+			std::cout<<newServer.width_<<" "<<newServer.cap_<< " " << newServer.dens_ << std::endl;
 			servers_.push(newServer);
+            servers_v_[i] = newServer;
 		}
 
 		myfile.close();
@@ -69,9 +77,19 @@ void ServerFarm::print(std::ostream &out) const{
 	}
 }
 
+void ServerFarm::print_servers(std::ostream &out) const{
+	for(size_t i = 0; i < nservers_; ++i){
+		out<<servers_v_[i];
+		out<<std::endl;
+	}
+}
 
 std::ostream &operator<<(std::ostream &out, const ServerFarm &s){
 	s.print(out);
 	return out;
 }
 
+std::ostream &operator<<(std::ostream &out, const Server &s){
+	s.print(out);
+	return out;
+}

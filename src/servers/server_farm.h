@@ -9,6 +9,23 @@
 #include <cstddef>
 #include <cstdlib>
 #include <algorithm>
+#include <numeric>
+#include <unistd.h>
+
+struct Pair {
+    unsigned int id_;
+    unsigned int value_;
+
+    Pair (int id = 0, int value = 0) {
+        id_ = id;
+        value_ = value;
+    }
+    static inline bool cmp (const Pair& a, const Pair& b) {
+        return a.value_ < b.value_;
+    }
+
+	void print(std::ostream &out) const;
+};
 
 struct Server {
 	size_t width_;
@@ -25,6 +42,9 @@ struct Server {
     }
     static inline bool cmp_width (const Server& a, const Server& b) {
         return a.width_ < b.width_;
+    }
+    static inline bool cmp_cap (const Server& a, const Server& b) {
+        return a.cap_ < b.cap_;
     }
 	void print(std::ostream &out) const;
 };
@@ -45,8 +65,15 @@ private:
 	size_t nunavaiable_;
 	size_t nservers_;
 
+    // id_ = row number, value_ = number of n/a slots
+    std::vector<Pair> na_slots_;
+    // first free slot[row id]
+    std::vector<int> first_slot_;
+    // vector of (row, slot) placement for servers: output
+    std::vector<Pair> placement_;
+    void count_na_slots();
     double avg_cperpr_; // capacity/(pools*rows)
-    double 
+    double median_server_length_; 
 public:
 	std::priority_queue<Server, std::vector<Server>, cap_less> servers_;
     std::vector <Server> servers_v_;
@@ -55,9 +82,13 @@ public:
 
 	void print(std::ostream &out) const;
 
-	void add_server();
+    void print_servers(std::ostream &out) const;
+    void print_placement(std::ostream &out) const;
 
-	void print_servers(std::ostream &out) const;
+	void add_server();
+    int find_place_inrow(unsigned int row, unsigned int width);
+    Pair find_place(unsigned int row, unsigned int width);
+    void place_servers();
     
     void sort_dens() {
         std::sort(servers_v_.begin(), servers_v_.end(), Server::cmp_dens);
@@ -67,9 +98,12 @@ public:
         std::sort(servers_v_.begin(), servers_v_.end(), Server::cmp_width);
     }
     
+    void count_avg_cperpr();
+    double get_avg_cperpr() {return avg_cperpr_;} 
 };
 
 std::ostream &operator<<(std::ostream &out, const ServerFarm &s);
 std::ostream &operator<<(std::ostream &out, const Server &s);
+std::ostream &operator<<(std::ostream &out, const Pair &s);
 
 #endif

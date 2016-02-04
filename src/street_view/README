@@ -1,7 +1,7 @@
 To build an executable from this directory, simply input:
 	make
 
-this will generate a build subdirectory and an executable "./server"
+this will generate a build subdirectory and an executable "./street_view"
 which takes no command line arguments.
 
 Please perform make clean before pushing to github(or make sure not to add build/executables).

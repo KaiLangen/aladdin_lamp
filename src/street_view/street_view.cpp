@@ -1,45 +1,6 @@
-#include "server_farm.h"
-#include <algorithm>
-#include <numeric>
+#include "street_view.h"
 
-struct edge {
-	int src_;
-	int dest_;
-	int time_;
-	int length_;
-	bool was_visited_;
-	bool dead_end_;
-};
-
-struct car {
-	std::vector<int> history_;
-	int time_left_;
-};
-
-class street_view_graph {
-private:
-	int njunctions_;
-	int nstreets_;
-	int total_time_;
-	int ncars_;
-	int start_;
-
-	std::vector<std::priority_queue<edge>* >graph_;
-
-public:
-	int total_distance_;
-
-	street_view_graph(std::string infile);
-
-	void create_car_path();
-
-	void output_to_file();
-
-	void calculate_score();
-};
-
-
-street_view_graph(std::string infile){
+street_view_graph::street_view_graph(std::string infile){
 	srand(time(NULL));
 	std::string line;
 	std::ifstream myfile(infile.c_str());
@@ -50,7 +11,13 @@ street_view_graph(std::string infile){
 		myfile >> ncars_;
 		myfile >> start_;
 
+        garage_.resize(ncars_, car(total_time_));
+
 		graph_.resize(njunctions_);
+
+        for(int  i = 0; i < njunctions_; ++i){
+            graph_[i] = new std::vector<edge>();
+        }
 
 		//who cares about coordinates?
 		for(int i = 0; i < njunctions_; ++i){
@@ -67,15 +34,17 @@ street_view_graph(std::string infile){
 			myfile >> new_edge.length_;
 
 			//if directions 1 input once, if 2 input twice
-			graph_[new_edge.src_].push_back(new_edge);
+			graph_[new_edge.src_]->push_back(new_edge);
 			if(directions == 2){
 				int temp_src = new_edge.src_;
 				new_edge.src_  = new_edge.dst_;
 				new_edge.dst_  = temp_src;
-				graph_[new_edge.dst_].push_back(new_edge);
+				graph_[new_edge.dst_]->push_back(new_edge);
 			}
 		}
-
+        for(int i = 0; i < njunctions_; ++i){
+            std::sort(graph_[i]->begin(), graph_[i]->end(), is_less());
+        }
 		myfile.close();
 	}
 	else{
@@ -85,4 +54,42 @@ street_view_graph(std::string infile){
 
 }
 
+street_view_graph::~street_view_graph(){
+for(int  i = 0; i < njunctions_; ++i){
+    delete graph_[i];
+}
 
+}
+
+void street_view_graph::drive (car &my_car) {
+    my_car.history_.push_back(start_);
+    int my_pos = start_;
+    while(my_car.time_left_ > 0){
+        for(std::vector<edge>::iterator it = graph_[my_pos]->begin(); it != graph_[my_pos]->end(); ++it){
+            if(!(*it).visited_){
+                my_pos = (*it).dst_;
+                my_car.history_.push_back(my_pos);
+                (*it).visited_ = true;
+                my_car.time_left_ -= (*it).time_;
+                break;
+            }
+        }
+        //all edges are visited
+        // generate a random number
+        int index = rand() % graph_[my_pos]->size();
+        std::vector<edge>::iterator it = graph_[my_pos]->begin();
+        std::advance(it,index);
+        // visit corresponding edge in the vector
+        my_pos = (*it).dst_;
+        my_car.history_.push_back(my_pos);
+        //(*it).visited_ = true;
+        my_car.time_left_ -= (*it).time_;
+
+    }
+}
+
+void street_view_graph::run () {
+    for (int i = 0; i < ncars_; i++) {
+        drive(garage_[i]);
+    }
+}

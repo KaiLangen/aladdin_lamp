@@ -11,7 +11,7 @@ CFLAGS = -Wall -g -pedantic
 #Executables created
 all: $(BUILD_DIR) $(EXECUTABLES)
 
-server: $(BUILD_DIR)/main.o $(BUILD_DIR)/street_view.o
+street_view: $(BUILD_DIR)/main.o $(BUILD_DIR)/street_view.o
 	$(CC) $(CFLAGS) -o  street_view $(BUILD_DIR)/main.o $(BUILD_DIR)/street_view.o
 
 #Builds the main object files for this project

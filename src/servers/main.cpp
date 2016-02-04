@@ -2,7 +2,7 @@
 #include "server_farm.h"
 
 int main(int argc, char * const argv[]){
-	ServerFarm sf("input_example.txt");
+	ServerFarm sf("dc.in");
 	std::cout<<sf<<std::endl;
 
 	for(size_t i = 0; i < sf.get_nservers(); ++i){

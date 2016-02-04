@@ -153,9 +153,7 @@ size_t ServerFarm::calculate_score(std::string file){
 	size_t guaranteed = (size_t)-1;
 	for(size_t i = 0; i < npools_; ++i){
 		size_t max_cap = *(std::max_element(pool_caps[i].begin(), pool_caps[i].end()));
-		std::cout<<max_cap<<std::endl;
 		size_t sum = std::accumulate(pool_caps[i].begin(), pool_caps[i].end(),0);
-		std::cout<<sum<<std::endl;
 
 		//guaranteed = min of (sum - max_cap) for all pools
 		guaranteed = std::min(guaranteed, (sum - max_cap));

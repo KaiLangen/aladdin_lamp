@@ -72,14 +72,15 @@ void ServerFarm::count_avg_cperpr() {
 // for rows and available slots we can use sparse matrix format: (number of element, number of consecutive free slots)
 int ServerFarm::find_place_inrow(unsigned int row, unsigned int width) {
     unsigned int consecutive = 0;
-    for (unsigned int sl = first_slot_[row]; sl < nslots_; sl++) {
+    //for (unsigned int sl = first_slot_[row]; sl < nslots_; sl++) {
+    for (unsigned int sl = 0; sl < nslots_; sl++) {
         if (matrix_[row][sl] == 0) {
            consecutive++;
         }
         if (consecutive == width) {
             unsigned int start = sl - consecutive + 1;
-            for (unsigned int i = start; i < width; i++) {
-                matrix_[row][i] = -1;
+            for (unsigned int i = 0; i < width; i++) {
+                matrix_[row][start + i] = -2;
             }
             return start;
         }
@@ -124,14 +125,14 @@ void ServerFarm::place_servers() {
             // in case the server does not fit in current row R we move to next
             // until find place in the row F
             // and for next server has to start from row R until fitting except row F
-            Pair place = find_place(current_row, server.width_);
+            Pair place = find_place(current_row % nrows_, server.width_);
             std::cout << "place: " << place; 
             if (place.id_ >= 0) {
                 placement_[s] = place;
+                for (int i = 0; i< server.width_; i++) {
+                    matrix_[place.id_][place.value_] = server.id_ + 100;
+                }
                 if (place.id_ == current_row) {
-                    for (int i = 0; i< server.width_; i++) {
-                        matrix_[place.id_][place.value_] = server.id_ + 1;
-                    }
                     current_row++;
                 }
             } else {

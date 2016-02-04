@@ -4,7 +4,8 @@ void Pair::print(std::ostream &out) const{
 	out<<id_<<" " << value_ << std::endl;
 }
 void Server::print(std::ostream &out) const{
-	out<<id_<<" " << width_ << " " << cap_ << " " << dens_ << std::endl;
+	//out<< "id: " <<id_<<" w: " << width_ << " cap: " << cap_ << " " << dens_ << std::endl;
+	out<< "id: " <<id_<<" w: " << width_ << " cap: " << cap_  << std::endl;
 }
 
 std::ostream &operator<<(std::ostream &out, const Server &s){

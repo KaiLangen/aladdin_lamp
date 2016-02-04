@@ -26,5 +26,5 @@ $(BUILD_DIR):
 
 #Removes all object files and executables
 clean:
-	rm -rf $(BUILD_DIR) $(EXECUTABLES) *~
+	rm -rf $(BUILD_DIR) $(EXECUTABLES) random_output.txt *~
 

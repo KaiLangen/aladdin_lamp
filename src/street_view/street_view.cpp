@@ -11,6 +11,11 @@ struct edge {
 	bool dead_end_;
 };
 
+struct car {
+	std::vector<int> history_;
+	int time_left_;
+};
+
 class street_view_graph {
 private:
 	int njunctions_;
@@ -19,9 +24,11 @@ private:
 	int ncars_;
 	int start_;
 
-	std::vector<std::priority_queue<edge> >graph;
+	std::vector<std::priority_queue<edge>* >graph_;
 
 public:
+	int total_distance_;
+
 	street_view_graph(std::string infile);
 
 	void create_car_path();
@@ -43,18 +50,30 @@ street_view_graph(std::string infile){
 		myfile >> ncars_;
 		myfile >> start_;
 
-		matrix_.resize(njunctions_);
+		graph_.resize(njunctions_);
 
 		//who cares about coordinates?
 		for(int i = 0; i < njunctions_; ++i){
 			getline(myfile, line);
-
 		}
 
+		int directions;
 		edge new_edge;
 		for(int i = 0; i < nstreets_; ++i){
 			myfile >> new_edge.src_;
 			myfile >> new_edge.dst_;
+			myfile >> directions;
+			myfile >> new_edge.time_;
+			myfile >> new_edge.length_;
+
+			//if directions 1 input once, if 2 input twice
+			graph_[new_edge.src_].push_back(new_edge);
+			if(directions == 2){
+				int temp_src = new_edge.src_;
+				new_edge.src_  = new_edge.dst_;
+				new_edge.dst_  = temp_src;
+				graph_[new_edge.dst_].push_back(new_edge);
+			}
 		}
 
 		myfile.close();

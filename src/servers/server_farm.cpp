@@ -1,4 +1,6 @@
 #include "server_farm.h"
+#include <algorithm>
+#include <numeric>
 
 ServerFarm::ServerFarm(std::string infile){
 	srand(time(NULL));
@@ -37,7 +39,7 @@ ServerFarm::ServerFarm(std::string infile){
 }
 
 ServerFarm::~ServerFarm(){
-	for(size_t i = 0; i < servers_.size(); ++i){
+	for(size_t i = 0; i < nservers_; ++i){
 		delete servers_[i];
 	}
 	servers_.clear();
@@ -46,7 +48,6 @@ ServerFarm::~ServerFarm(){
 //naive algorithm to add new servers to the server farm
 void ServerFarm::add_server(size_t sindex){
 	Server *newServer = servers_[sindex];
-	std::cout<<newServer->cap_<<std::endl;
 	size_t consecutive = 0;
 	//start at a random row/column combination and iterate through matrix
 	size_t rand_row = static_cast<size_t>(rand() % nrows_);
@@ -95,7 +96,7 @@ void ServerFarm::print(std::ostream &out) const{
 void ServerFarm::output_server_data(std::string outfile){
 	std::ofstream ofile(outfile.c_str());
 	if(ofile.is_open()){
-		for(size_t i = 0; i < servers_.size(); ++i){
+		for(size_t i = 0; i < nservers_; ++i){
 			Server *s = servers_[i];
 			if(s->was_placed_)
 				ofile<<s->row_<<" "<<s->col_<<" "<<s->pool_<<std::endl;
@@ -108,6 +109,59 @@ void ServerFarm::output_server_data(std::string outfile){
 		std::cout<<"Unable to open output file"<<std::endl;
 		exit(EXIT_FAILURE);
 	}
+}
+
+//referenced compute from count_score.cpp
+size_t ServerFarm::calculate_score(std::string file){
+	std::ifstream myfile(file.c_str());
+	std::string line;
+
+	//pool_caps tracks pool capacities per row, initialize to zero
+	std::vector<std::vector<size_t> >pool_caps(npools_, std::vector<size_t>(nrows_, 0));
+
+	//extract data from file
+	size_t row;
+	size_t col;
+	size_t pool;
+	size_t index = 0;
+	if(myfile.is_open()){
+		while (getline(myfile, line)) {
+			//if line does not equal "x"
+		    if (line.compare("x") != 0){
+				std::stringstream stream(line);
+
+				stream >> row;
+				stream >> col;
+				stream >> pool;
+				(void)col; //col is not used
+
+				//servers_ has the same order as the output file
+				//so can get capacity from there
+				pool_caps[pool][row] += servers_[index]->cap_;
+			}
+			++index;
+		}
+
+		myfile.close();
+	}
+	else{
+		std::cout<<"Unable to open file (calculate)"<<std::endl;
+		exit(EXIT_FAILURE);
+	}
+
+	//now use extracted data to calculate guaranteed capacity
+	size_t guaranteed = (size_t)-1;
+	for(size_t i = 0; i < npools_; ++i){
+		size_t max_cap = *(std::max_element(pool_caps[i].begin(), pool_caps[i].end()));
+		std::cout<<max_cap<<std::endl;
+		size_t sum = std::accumulate(pool_caps[i].begin(), pool_caps[i].end(),0);
+		std::cout<<sum<<std::endl;
+
+		//guaranteed = min of (sum - max_cap) for all pools
+		guaranteed = std::min(guaranteed, (sum - max_cap));
+	}
+
+	return guaranteed;
 }
 
 std::ostream &operator<<(std::ostream &out, const ServerFarm &s){

@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <queue>
@@ -36,9 +37,9 @@ private:
 	size_t npools_;
 	size_t nunavaiable_;
 	size_t nservers_;
+	std::vector<Server*> servers_;
 
 public:
-	std::vector<Server*> servers_;
 
 	ServerFarm(std::string filename);
 
@@ -49,6 +50,10 @@ public:
 	void add_server(size_t sindex);
 
 	void output_server_data(std::string outfile);
+
+	size_t calculate_score(std::string file);
+
+	size_t get_nservers(){return nservers_;};
 };
 
 std::ostream &operator<<(std::ostream &out, const ServerFarm &s);

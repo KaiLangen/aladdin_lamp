@@ -24,10 +24,20 @@ struct edge {
 };
 
 struct car {
-	std::vector<int> history_;
-	int time_left_;
+
+    typedef std::vector<int>::iterator car_history_iterator;
+
+    std::vector<int> history_;
+    int time_left_;
 
     car (int t = 0): time_left_(t) {}
+
+    friend std::ostream& operator<<(std::ostream  & os, car& c);
+
+    car_history_iterator history_begin() { return history_.begin();};
+    car_history_iterator history_end() { return history_.end();};
+    size_t history_size() { return history_.size();};
+
 };
 
 struct is_less {
@@ -45,7 +55,8 @@ private:
 	int start_;
 
 	std::vector<std::vector<edge>* >graph_;
-    std::vector<car> garage_;
+        std::vector<car> garage_;
+
 public:
 	int total_distance_;
 
@@ -56,9 +67,9 @@ public:
 	void drive(car& mycar);
 	void run();
 
-	void output_to_file();
-
 	void calculate_score();
+
+        void output_to_file(std::string outfile);
 };
 
 #endif

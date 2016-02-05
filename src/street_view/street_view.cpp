@@ -1,6 +1,7 @@
 #include "street_view.h"
 
 street_view_graph::street_view_graph(std::string infile){
+
 	srand(time(NULL));
 	std::string line;
 	std::ifstream myfile(infile.c_str());
@@ -11,15 +12,16 @@ street_view_graph::street_view_graph(std::string infile){
 		myfile >> ncars_;
 		myfile >> start_;
 
-        garage_.resize(ncars_, car(total_time_));
+                garage_.resize(ncars_, car(total_time_));
 
-		graph_.resize(njunctions_);
+	        graph_.resize(njunctions_);
 
-        for(int  i = 0; i < njunctions_; ++i){
-            graph_[i] = new std::vector<edge>();
-        }
+                for(int  i = 0; i < njunctions_; ++i){
+                    graph_[i] = new std::vector<edge>();
+                }
 
 		//who cares about coordinates?
+                getline(myfile, line); // this corrects a bug: when you read the individual inputs first, it doesn't count as a line, so we have to throw away an additional one at the start
 		for(int i = 0; i < njunctions_; ++i){
 			getline(myfile, line);
 		}
@@ -39,12 +41,12 @@ street_view_graph::street_view_graph(std::string infile){
 				int temp_src = new_edge.src_;
 				new_edge.src_  = new_edge.dst_;
 				new_edge.dst_  = temp_src;
-				graph_[new_edge.dst_]->push_back(new_edge);
+				graph_[new_edge.src_]->push_back(new_edge);
 			}
 		}
-        for(int i = 0; i < njunctions_; ++i){
-            std::sort(graph_[i]->begin(), graph_[i]->end(), is_less());
-        }
+                for(int i = 0; i < njunctions_; ++i){
+                    std::sort(graph_[i]->begin(), graph_[i]->end(), is_less());
+                }
 		myfile.close();
 	}
 	else{
@@ -93,3 +95,30 @@ void street_view_graph::run () {
         drive(garage_[i]);
     }
 }
+
+std::ostream& operator<<(std::ostream  & os, car& c) {
+    os << c.history_size() << std::endl;
+    for( car::car_history_iterator it= c.history_begin(); it != c.history_end(); it++){
+        os << *it << std::endl;
+    }
+    return os;
+}
+
+
+void street_view_graph::output_to_file(std::string outfile) {
+    std::ofstream ofile(outfile.c_str());
+    if(ofile.is_open()){
+        // write total number of cars
+        ofile << garage_.size() << std::endl;
+
+        for(std::vector<car>::iterator it = garage_.begin(); it != garage_.end(); it++){
+            ofile << *it << std::endl;
+        }
+        ofile.close();
+    }
+    else{
+        std::cout<<"Unable to open output file"<<std::endl;
+        exit(EXIT_FAILURE);
+    }
+}
+

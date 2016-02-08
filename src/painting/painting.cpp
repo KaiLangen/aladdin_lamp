@@ -1,9 +1,9 @@
-#include "server_farm.h"
+#include "painting.h"
 #include <algorithm>
 #include <numeric>
 
 painting::painting(std::string infile){
-/*	srand(time(NULL));
+	srand(time(NULL));
 	std::ifstream myfile(infile.c_str());
 	if(myfile.is_open()){
 		myfile >> nrows_;

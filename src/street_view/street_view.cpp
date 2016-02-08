@@ -66,28 +66,35 @@ for(int  i = 0; i < njunctions_; ++i){
 void street_view_graph::drive (car &my_car) {
     my_car.history_.push_back(start_);
     int my_pos = start_;
-    while(my_car.time_left_ > 0){
+    while(my_car.time_left_ >= 0){
+
+        bool all_edges_visited = true;
+
         for(std::vector<edge>::iterator it = graph_[my_pos]->begin(); it != graph_[my_pos]->end(); ++it){
             if(!(*it).visited_){
                 my_pos = (*it).dst_;
                 my_car.history_.push_back(my_pos);
                 (*it).visited_ = true;
                 my_car.time_left_ -= (*it).time_;
+                all_edges_visited = false;
                 break;
             }
         }
-        //all edges are visited
-        // generate a random number
-        int index = rand() % graph_[my_pos]->size();
-        std::vector<edge>::iterator it = graph_[my_pos]->begin();
-        std::advance(it,index);
-        // visit corresponding edge in the vector
-        my_pos = (*it).dst_;
-        my_car.history_.push_back(my_pos);
-        //(*it).visited_ = true;
-        my_car.time_left_ -= (*it).time_;
-
+        //check if all edges are visited
+        if ( all_edges_visited ) {
+            // generate a random number
+            int index = rand() % graph_[my_pos]->size();
+            std::vector<edge>::iterator it = graph_[my_pos]->begin();
+            std::advance(it,index);
+            // visit corresponding edge in the vector
+            my_pos = (*it).dst_;
+            my_car.history_.push_back(my_pos);
+            //(*it).visited_ = true;
+            my_car.time_left_ -= (*it).time_;
+        }
     }
+    // when we get here, the last visited edge was over the time limit, so we remove it
+    my_car.history_.pop_back();
 }
 
 void street_view_graph::run () {
@@ -182,7 +189,7 @@ long long int street_view_graph::calculate_score(std::string filename) {
             old_junction = current_junction;
         }
         // check that total car time is valid
-        if ( elapsed_time >= total_time_ ) {
+        if ( elapsed_time > total_time_ ) {
             std::cerr << "Invalid time!" << std::endl;
             std::cerr << "total time of car " << car << " was " << elapsed_time << " which is larger than the total allowed time of " << total_time_ << std::endl;
             exit(2);

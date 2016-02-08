@@ -9,8 +9,9 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
-#include <vector>
+#include <set>
 #include <numeric>
+#include <utility>
 
 struct edge {
 	int src_;
@@ -67,7 +68,7 @@ public:
 	void drive(car& mycar);
 	void run();
 
-	void calculate_score();
+	long long int calculate_score(std::string filename);
 
         void output_to_file(std::string outfile);
 };

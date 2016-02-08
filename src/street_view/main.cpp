@@ -14,5 +14,7 @@ int main(int argc, char * const argv[]){
     std::cout<<"outputting file"<<std::endl;
     g.output_to_file("computed_output_paris_54000.txt");
 
+    std::cout << "total score: " << g.calculate_score("computed_output_paris_54000.txt") << std::endl;
+
     return 0;
 }

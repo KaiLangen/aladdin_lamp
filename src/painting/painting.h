@@ -12,7 +12,9 @@
 
 class painting {
 private:
-
+	int nrows_;
+	int ncols_;
+	std::vector<std::vector<int> > input_matrix_;
 public:
 
 	painting(std::string filename);

@@ -4,23 +4,19 @@
 
 painting::painting(std::string infile){
 	srand(time(NULL));
+	std::string line;
 	std::ifstream myfile(infile.c_str());
 	if(myfile.is_open()){
 		myfile >> nrows_;
 		myfile >> ncols_;
 		size_t x,y;
-		for(size_t i = 0; i < nunavaiable_; ++i){
-			myfile >> x;
-			myfile >> y;
-			matrix_[x][y] = -1;
-		}
-
-		for(size_t i = 0; i < nservers_; ++i){
-			Server *newServer = new Server();
-			myfile >> newServer->width_;
-			myfile >> newServer->cap_;
-			std::cout<<newServer->width_<<" "<<newServer->cap_<<std::endl;
-			servers_.push_back(newServer);
+                
+		getline(myfile, line); 
+		for(size_t i = 0; i < nrows_; ++i){
+		    line = getline(myfile, line); 
+		    for(int j = 0; j < ncols_; ++j){
+			input_matrix_[i].push_back(line[i]);
+		    }
 		}
 
 		myfile.close();
@@ -28,7 +24,7 @@ painting::painting(std::string infile){
 	else{
 		std::cout<<"Unable to open input file"<<std::endl;
 		exit(EXIT_FAILURE);
-	}*/
+	}
 }
 
 painting::~painting(){
@@ -39,6 +35,13 @@ void painting::add_server(size_t sindex){
 }
 
 void painting::print(std::ostream &out) const{
+    for(int i = 0; i < nrows_; ++i){
+        for(int j = 0; j < nrows_; ++j){
+	   out<<input_matrix_[i][j];
+        }
+        out<<std::endl;
+    }
+
 }
 
 void painting::output_server_data(std::string outfile){

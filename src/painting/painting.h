@@ -24,6 +24,8 @@ public:
 	void print(std::ostream &out) const;
 
 	void add_command(size_t sindex);
+
+        void output_painting_data(std::string outfile);
 };
 
 std::ostream &operator<<(std::ostream &out, const painting &s);

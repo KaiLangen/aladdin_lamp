@@ -103,4 +103,20 @@ std::ostream & operator<<(std::ostream& out, const operation & op) {
             exit(1);
     }
     out << std::endl;
+    return out;
 }
+
+void painting::output_painting_data (std::string outfile) {
+    std::ofstream ofile(outfile.c_str());
+    if(ofile.is_open()){
+        ofile << op_list.size() << std::endl;
+
+        std::list<operation>::iterator it;
+        for(it = op_list.begin(); it != op_list.end(); it++){
+            ofile << *(it);
+        }
+    }
+
+}
+
+

@@ -24,6 +24,7 @@ private:
 	int nrows_;
 	int ncols_;
 	std::vector<std::vector<bool> > input_matrix_;
+        std::list<operation> op_list;
 public:
 
 	painting(std::string filename);

@@ -6,7 +6,7 @@ int main(int argc, char * const argv[]){
         operation op1(LINE, {1,1,43,5});
         std::cout << op1;
       
-        painting p("logo.in");
+        painting p("learn_and_teach.in");
         std::cout << p.elem_remaining_<<std::endl;
         std::cout<<p<<std::endl;
         p.paint_horz_lines();
@@ -16,7 +16,7 @@ int main(int argc, char * const argv[]){
 
         p.output_painting_data("output.txt");
 
-        check trial("output.txt");	
+        check trial("output.txt", p.nrows_, p.ncols_);	
         trial.cmp(p.starting_matrix_);
   
         return 0;

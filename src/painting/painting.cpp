@@ -97,6 +97,9 @@ void painting::paint_horz_lines(){
                   --elem_remaining_;
               }
            }
+           else {
+               consecutive = 0;
+           }
            if((j == ncols_ - 1) && working_matrix_[i][j] && (consecutive > 1)){//end of row
 	      int start_col = (j - consecutive + 1);
               operation new_op(LINE, {i, start_col, i, (j)});
@@ -108,6 +111,7 @@ void painting::paint_horz_lines(){
               }
            }
         }       
+        consecutive = 0;
     }
 }
 

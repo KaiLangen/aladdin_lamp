@@ -14,7 +14,6 @@ class check {
         int ncommands_;
         int R, C;
 
-
         int choose_op (std::string cmd) ;
 
         void draw (int type_op, std::stringstream &ss) ;
@@ -26,7 +25,7 @@ class check {
         void paint_square (int r, int c, int s) ;
 
     public:
-       check (std::string ofname) ;
+       check (std::string ofname, int r, int c) ;
 
        bool cmp (const std::vector < std::vector <bool> > &reference) ;
 

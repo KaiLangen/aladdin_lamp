@@ -22,11 +22,11 @@ struct operation {
 
 class painting {
 private:
-	int nrows_;
-	int ncols_;
 	std::vector<std::vector<bool> > working_matrix_;
         std::list<operation> op_list;
 public:
+	int nrows_;
+	int ncols_;
 	std::vector<std::vector<bool> > starting_matrix_;
         int elem_remaining_;
 

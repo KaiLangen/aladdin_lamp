@@ -67,23 +67,25 @@ void check::erase_cell (int x, int y) {
 }
 
 void check::paint_square (int r, int c, int s) {
-   for (int i = s - r; i <= s + r; i++) {
-           for (int j = s - c; j <= s + c; j++) {
+   for (int i = r - s; i <= r + s; i++) {
+           for (int j = c - s; j <= c + s; j++) {
                 output_[i][j] = true;
            }
    }
 }
-check::check (std::string ofname) {
-    R = 5, C = 7;
-    output_.resize(R);
-    for (int i =0; i < R; i++)
-        output_[i].resize(C);
+check::check (std::string ofname, int r, int c) {
+    R = r; 
+    C = c;
     std::ifstream ofile(ofname.c_str());    
     if (!ofile.is_open()) {
         std::cout<<"Unable to open input file"<<std::endl;
         exit(EXIT_FAILURE);
     }
-    
+
+    output_.resize(R);
+    for (int i =0; i < R; i++)
+        output_[i].resize(C);
+ 
     ofile >> ncommands_;
      
     std::string cmd_line;

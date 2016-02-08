@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <queue>
@@ -50,9 +51,11 @@ public:
     void print_placement(std::ostream &out) const;
 
 	void add_server();
-    int find_place_inrow(unsigned int row, unsigned int width);
-    Pair find_place(unsigned int row, unsigned int width);
+    int find_place_inrow(size_t row, size_t width, int id);
+    Pair find_place(size_t row, size_t width, int id);
     void place_servers();
+    void assign_pools();    
+    void output_server_data(std::string outfile);
     
     void sort_dens() {
         std::sort(servers_v_.begin(), servers_v_.end(), Server::cmp_dens);
@@ -61,6 +64,18 @@ public:
     void sort_width() {
         std::sort(servers_v_.begin(), servers_v_.end(), Server::cmp_width);
     }
+
+    void sort_id() {
+        std::sort(servers_v_.begin(), servers_v_.end(), Server::cmp_id);
+    }
+    void sort_row() {
+        std::sort(servers_v_.begin(), servers_v_.end(), Server::cmp_row);
+    }
+    void sort_slot() {
+        std::sort(servers_v_.begin(), servers_v_.end(), Server::cmp_slot);
+    }
+
+    size_t calc_score(std::string file); 
     
     void count_avg_cperpr();
     double get_avg_cperpr() {return avg_cperpr_;} 

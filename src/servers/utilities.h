@@ -28,10 +28,13 @@ struct Pair {
 };
 
 struct Server {
-	size_t width_;
-	size_t cap_;
-    unsigned int id_;
+	int width_;
+	int cap_;
+    int id_;
     double dens_;
+    int row_;
+    int slot_;
+    int pool_;
 /*
     inline bool operator() (const Server& a, const Server& b) {
         return a.dens_ < b.dens_;
@@ -46,6 +49,16 @@ struct Server {
     //sort in decreasing order
     static inline bool cmp_cap (const Server& a, const Server& b) {
         return a.cap_ > b.cap_;
+    }
+
+    static inline bool cmp_id (const Server& a, const Server& b) {
+        return a.id_ < b.id_;
+    }
+    static inline bool cmp_row (const Server& a, const Server& b) {
+        return a.row_ < b.row_;
+    }
+    static inline bool cmp_slot (const Server& a, const Server& b) {
+        return a.slot_ < b.slot_;
     }
 	void print(std::ostream &out) const;
 };

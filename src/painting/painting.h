@@ -1,5 +1,5 @@
-#ifndef server_farm_h
-#define server_farm_h
+#ifndef painting_h
+#define painting_h
 
 #include <iostream>
 #include <fstream>
@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <queue>
+#include <list>
 #include <cstddef>
 #include <cstdlib>
 
@@ -23,9 +24,11 @@ class painting {
 private:
 	int nrows_;
 	int ncols_;
-	std::vector<std::vector<bool> > input_matrix_;
+	std::vector<std::vector<bool> > working_matrix_;
         std::list<operation> op_list;
 public:
+	std::vector<std::vector<bool> > starting_matrix_;
+        int elem_remaining_;
 
 	painting(std::string filename);
 
@@ -33,7 +36,10 @@ public:
 
 	void print(std::ostream &out) const;
 
-	void add_command(size_t sindex);
+	void paint_vert_line();
+	void paint_horz_lines();
+	void paint_elems();
+	void paint_square();
 
         void output_painting_data(std::string outfile);
 };

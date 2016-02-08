@@ -8,29 +8,35 @@
 painting::painting(std::string infile){
 	srand(time(NULL));
 	std::string line;
+        elem_remaining_ = 0;
 	std::ifstream myfile(infile.c_str());
 	if(myfile.is_open()){
 		myfile >> nrows_;
 		myfile >> ncols_;
 
-//                std::cout<<"rows "<<nrows_<<"cols "<<ncols_<<std::endl;
-
-		input_matrix_.resize(nrows_);
-                for(int i = 0; i < nrows_; ++i)
-                    input_matrix_[i].resize(ncols_);
+		working_matrix_.resize(nrows_);
+		starting_matrix_.resize(nrows_);
+                for(int i = 0; i < nrows_; ++i){
+                    working_matrix_[i].resize(ncols_);
+		    starting_matrix_[i].resize(ncols_);
+                }
                 
 		getline(myfile, line); 
 		for(int i = 0; i < nrows_; ++i){
 		    getline(myfile, line); 
 		    for(int j = 0; j < ncols_; ++j){
-			if(line[j] == '#')
-			   input_matrix_[i][j] = true;
-                        else
-			   input_matrix_[i][j] = false;
+			if(line[j] == '#'){
+			   working_matrix_[i][j] = true;
+			   starting_matrix_[i][j] = true;
+                           ++elem_remaining_;
+                        }
+                        else{
+			   working_matrix_[i][j] = false;
+			   starting_matrix_[i][j] = false;
+                        }
 
 		    }
 		}
-
 		myfile.close();
 	}
 	else{
@@ -42,35 +48,77 @@ painting::painting(std::string infile){
 painting::~painting(){
 }
 
-void painting::add_command(size_t sindex){
+void painting::paint_elems(){
+    for(int i = 0; i < nrows_; ++i){
+        for(int j = 0; j < ncols_; ++j){
+	   if(working_matrix_[i][j]){
+               //push command to list
+               operation new_op(SQUARE, { i, j, 0});
+               op_list.push_back(new_op);
+               working_matrix_[i][j] = false;
+               --elem_remaining_;
+           }
+        }       
+    }
+}
+
+void painting::paint_square(){
+    for(int i = 0; i < nrows_; ++i){
+        for(int j = 0; j < ncols_; ++j){
+        //push command to list
+	
+        }       
+    }
+}
+
+void painting::paint_vert_line(){
+    for(int j = 0; j < ncols_; ++j){
+        for(int i = 0; i < nrows_; ++i){
+        //push command to list
+	    
+        }       
+    }
+}
+
+void painting::paint_horz_lines(){
+    int consecutive = 0;
+    for(int i = 0; i < nrows_; ++i){
+        for(int j = 0; j < ncols_; ++j){
+	   if(working_matrix_[i][j]){
+	      ++consecutive;
+           }
+           else if(consecutive > 1){
+	      int start_col = (j - consecutive);
+              operation new_op(LINE, {i, start_col, i, (j - 1)});
+              op_list.push_back(new_op);
+              consecutive = 0;
+              for(int k = start_col; k < j; ++k){
+                  working_matrix_[i][k] = false; 
+                  --elem_remaining_;
+              }
+           }
+           if((j == ncols_ - 1) && working_matrix_[i][j] && (consecutive > 1)){//end of row
+	      int start_col = (j - consecutive + 1);
+              operation new_op(LINE, {i, start_col, i, (j)});
+              op_list.push_back(new_op);
+              consecutive = 0;
+              for(int k = start_col; k <= j; ++k){
+                  working_matrix_[i][k] = false; 
+                  --elem_remaining_;
+              }
+           }
+        }       
+    }
 }
 
 void painting::print(std::ostream &out) const{
     for(int i = 0; i < nrows_; ++i){
         for(int j = 0; j < ncols_; ++j){
-	   out<<input_matrix_[i][j];
+	   out<<working_matrix_[i][j];
         }
         out<<std::endl;
     }
 
-}
-
-void painting::output_painting_data(std::string outfile){
-/*	std::ofstream ofile(outfile.c_str());
-	if(ofile.is_open()){
-		for(size_t i = 0; i < nservers_; ++i){
-			Server *s = servers_[i];
-			if(s->was_placed_)
-				ofile<<s->row_<<" "<<s->col_<<" "<<s->pool_<<std::endl;
-			else
-				ofile<<"x"<<std::endl;
-		}
-		ofile.close();
-	}
-	else{
-		std::cout<<"Unable to open output file"<<std::endl;
-		exit(EXIT_FAILURE);
-	}*/
 }
 
 std::ostream &operator<<(std::ostream &out, const painting &s){
@@ -115,6 +163,7 @@ void painting::output_painting_data (std::string outfile) {
         for(it = op_list.begin(); it != op_list.end(); it++){
             ofile << *(it);
         }
+        ofile.close();
     }
 
 }

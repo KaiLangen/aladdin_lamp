@@ -1,6 +1,7 @@
 #include "painting.h"
 #include <algorithm>
 #include <numeric>
+#include <string>
 
 painting::painting(std::string infile){
 	srand(time(NULL));
@@ -13,9 +14,13 @@ painting::painting(std::string infile){
                 
 		getline(myfile, line); 
 		for(size_t i = 0; i < nrows_; ++i){
-		    line = getline(myfile, line); 
+		    getline(myfile, line); 
 		    for(int j = 0; j < ncols_; ++j){
-			input_matrix_[i].push_back(line[i]);
+			if(strcmp(line[j],"#") == 0){
+			   input_matrix_[i].push_back(true);
+                        else
+			   input_matrix_[i].push_back(false);
+
 		    }
 		}
 
@@ -31,7 +36,7 @@ painting::~painting(){
 }
 
 //naive algorithm to add new servers to the server farm
-void painting::add_server(size_t sindex){
+void painting::add_command(size_t sindex){
 }
 
 void painting::print(std::ostream &out) const{
@@ -60,10 +65,6 @@ void painting::output_server_data(std::string outfile){
 		std::cout<<"Unable to open output file"<<std::endl;
 		exit(EXIT_FAILURE);
 	}*/
-}
-
-//referenced compute from count_score.cpp
-size_t painting::calculate_score(std::string file){
 }
 
 std::ostream &operator<<(std::ostream &out, const painting &s){

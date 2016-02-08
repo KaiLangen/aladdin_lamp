@@ -128,6 +128,7 @@ struct ops {
             for (int i = 0; i < R; i++) {
                 for (int j = 0; j < C; j++) {
                     if (output_[i][j] != reference[i][j])
+                        std::cout << "mismatch in " << i << " " << j << std::endl;
                         return false;
                 }
             }

@@ -72,3 +72,29 @@ std::ostream &operator<<(std::ostream &out, const painting &s){
 	return out;
 }
 
+std::ostream & operator<<(std::ostream& out, const operation & op) {
+    switch(op.name_) {
+        case LINE:
+            out << "PAINT_LINE ";
+            for(size_t i = 0; i < 4; ++i) {
+                out << op.data_[i] << " ";
+            }
+            break;
+        case SQUARE:
+            out << "PAINT_SQUARE ";
+            for(size_t i = 0; i < 3; ++i) {
+                out << op.data_[i] << " ";
+            }
+            break;
+        case ERASE:
+            out << "ERASE_CELL ";
+            for(size_t i = 0; i < 2; ++i) {
+                out << op.data_[i] << " ";
+            }
+            break;
+        default:
+            std::cerr << "Unrecognized operation while performing output!" << std::endl;
+            exit(1);
+    }
+    out << std::endl;
+}

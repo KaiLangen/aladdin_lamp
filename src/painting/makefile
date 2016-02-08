@@ -6,7 +6,7 @@ EXECUTABLES = painting
 
 #Flags
 CC = g++
-CFLAGS = -Wall -g -pedantic
+CFLAGS = -Wall -g -pedantic -std=c++11
 
 #Executables created
 all: $(BUILD_DIR) $(EXECUTABLES)

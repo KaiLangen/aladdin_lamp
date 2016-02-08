@@ -10,6 +10,15 @@
 #include <cstddef>
 #include <cstdlib>
 
+typedef enum { LINE, SQUARE, ERASE } op_name;
+
+struct operation {
+    operation(op_name n, std::vector<int> d) : name_(n), data_(d) {};
+    op_name name_;
+    std::vector<int> data_;
+    friend std::ostream &operator<<(std::ostream& out, const operation & op);
+};
+
 class painting {
 private:
 	int nrows_;

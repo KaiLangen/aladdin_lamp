@@ -122,3 +122,74 @@ void street_view_graph::output_to_file(std::string outfile) {
     }
 }
 
+
+long long int street_view_graph::calculate_score(std::string filename) {
+
+    std::ifstream myfile(filename.c_str());
+    if( !myfile.is_open() ){
+		std::cerr<<"Unable to open results file"<<std::endl;
+		exit(EXIT_FAILURE);
+    }
+
+    // read in number of cars
+    int num_cars;
+    myfile >> num_cars;
+
+    // initialize total score and set of visited edges
+    long long int total_score = 0;
+    std::set<std::pair<int,int> > visited_edges;
+
+    // for each car
+    for(int car = 0; car < num_cars; ++car){
+        // initialize time to 0
+        int elapsed_time = 0;
+
+        // for each edge in the car's history
+        int tot_visited_junctions;
+        myfile >> tot_visited_junctions;
+
+        // get initial junction
+        int old_junction;
+        myfile >> old_junction;
+
+        for (int junctions_so_far = 1; junctions_so_far < tot_visited_junctions; ++junctions_so_far){
+            int current_junction;
+            myfile >> current_junction;
+
+            // try to find this edge in the graph
+            std::vector<edge>::iterator it;
+            it = std::find_if( graph_[old_junction]->begin(), graph_[old_junction]->end(), [&] (edge e) { return e.dst_ == current_junction; }  );
+
+            // check if it was a valid edge
+            if ( it != graph_[old_junction]->end() ) {
+                // if it was never visited
+                if ( std::find( visited_edges.begin(), visited_edges.end(), std::make_pair(old_junction, current_junction) ) == visited_edges.end() &&
+                     std::find( visited_edges.begin(), visited_edges.end(), std::make_pair(current_junction, old_junction) ) == visited_edges.end() ) {
+                    // add to total score
+                    total_score += it->length_;
+                    // insert in list of visited edges
+                    visited_edges.insert(std::make_pair(old_junction, current_junction));
+                }
+                // add to total time
+                elapsed_time += it->time_;
+            } else {
+                std::cerr << "Invalid junction!" << std::endl;
+                std::cerr << "junction " << current_junction << " does not follow junction " << old_junction <<  std::endl;
+                std::cerr << "visited by car " << car << " at time " << elapsed_time << std::endl;
+                exit(1);
+            }
+
+            old_junction = current_junction;
+        }
+        // check that total car time is valid
+        if ( elapsed_time >= total_time_ ) {
+            std::cerr << "Invalid time!" << std::endl;
+            std::cerr << "total time of car " << car << " was " << elapsed_time << " which is larger than the total allowed time of " << total_time_ << std::endl;
+            exit(2);
+        }
+    }
+    // close file
+    myfile.close();
+
+    return total_score;
+}

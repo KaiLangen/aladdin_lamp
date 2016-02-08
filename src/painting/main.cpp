@@ -1,5 +1,6 @@
 #include <iostream>
 #include "painting.h"
+#include "check.h"
 
 int main(int argc, char * const argv[]){
         operation op1(LINE, {1,1,43,5});
@@ -14,5 +15,9 @@ int main(int argc, char * const argv[]){
         std::cout<<p.elem_remaining_<<std::endl;
 
         p.output_painting_data("output.txt");
-	return 0;
+
+        check trial("output.txt");	
+        trial.cmp(p.starting_matrix_);
+  
+        return 0;
 }

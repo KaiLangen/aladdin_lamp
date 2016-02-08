@@ -11,8 +11,8 @@ CFLAGS = -Wall -g -pedantic -std=c++11
 #Executables created
 all: $(BUILD_DIR) $(EXECUTABLES)
 
-painting: $(BUILD_DIR)/main.o $(BUILD_DIR)/painting.o
-	$(CC) $(CFLAGS) -o  painting $(BUILD_DIR)/main.o $(BUILD_DIR)/painting.o
+painting: $(BUILD_DIR)/main.o $(BUILD_DIR)/painting.o $(BUILD_DIR)/check.o
+	$(CC) $(CFLAGS) -o  painting $(BUILD_DIR)/main.o $(BUILD_DIR)/painting.o $(BUILD_DIR)/check.o
 
 #Builds the main object files for this project
 $(BUILD_DIR)/%.o: %.cpp

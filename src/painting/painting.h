@@ -12,7 +12,9 @@
 
 class painting {
 private:
-
+	int nrows_;
+	int ncols_;
+	std::vector<std::vector<bool> > input_matrix_;
 public:
 
 	painting(std::string filename);
@@ -21,7 +23,9 @@ public:
 
 	void print(std::ostream &out) const;
 
-	void add_server(size_t sindex);
+	void add_command(size_t sindex);
+
+        void output_painting_data(std::string outfile);
 };
 
 std::ostream &operator<<(std::ostream &out, const painting &s);

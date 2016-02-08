@@ -1,26 +1,34 @@
 #include "painting.h"
 #include <algorithm>
 #include <numeric>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 painting::painting(std::string infile){
 	srand(time(NULL));
+	std::string line;
 	std::ifstream myfile(infile.c_str());
 	if(myfile.is_open()){
 		myfile >> nrows_;
 		myfile >> ncols_;
-		size_t x,y;
-		for(size_t i = 0; i < nunavaiable_; ++i){
-			myfile >> x;
-			myfile >> y;
-			matrix_[x][y] = -1;
-		}
 
-		for(size_t i = 0; i < nservers_; ++i){
-			Server *newServer = new Server();
-			myfile >> newServer->width_;
-			myfile >> newServer->cap_;
-			std::cout<<newServer->width_<<" "<<newServer->cap_<<std::endl;
-			servers_.push_back(newServer);
+//                std::cout<<"rows "<<nrows_<<"cols "<<ncols_<<std::endl;
+
+		input_matrix_.resize(nrows_);
+                for(int i = 0; i < nrows_; ++i)
+                    input_matrix_[i].resize(ncols_);
+                
+		getline(myfile, line); 
+		for(int i = 0; i < nrows_; ++i){
+		    getline(myfile, line); 
+		    for(int j = 0; j < ncols_; ++j){
+			if(line[j] == '#')
+			   input_matrix_[i][j] = true;
+                        else
+			   input_matrix_[i][j] = false;
+
+		    }
 		}
 
 		myfile.close();
@@ -28,20 +36,26 @@ painting::painting(std::string infile){
 	else{
 		std::cout<<"Unable to open input file"<<std::endl;
 		exit(EXIT_FAILURE);
-	}*/
+	}
 }
 
 painting::~painting(){
 }
 
-//naive algorithm to add new servers to the server farm
-void painting::add_server(size_t sindex){
+void painting::add_command(size_t sindex){
 }
 
 void painting::print(std::ostream &out) const{
+    for(int i = 0; i < nrows_; ++i){
+        for(int j = 0; j < ncols_; ++j){
+	   out<<input_matrix_[i][j];
+        }
+        out<<std::endl;
+    }
+
 }
 
-void painting::output_server_data(std::string outfile){
+void painting::output_painting_data(std::string outfile){
 /*	std::ofstream ofile(outfile.c_str());
 	if(ofile.is_open()){
 		for(size_t i = 0; i < nservers_; ++i){
@@ -57,10 +71,6 @@ void painting::output_server_data(std::string outfile){
 		std::cout<<"Unable to open output file"<<std::endl;
 		exit(EXIT_FAILURE);
 	}*/
-}
-
-//referenced compute from count_score.cpp
-size_t painting::calculate_score(std::string file){
 }
 
 std::ostream &operator<<(std::ostream &out, const painting &s){

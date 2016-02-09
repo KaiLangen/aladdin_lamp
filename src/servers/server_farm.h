@@ -49,10 +49,11 @@ public:
 
     void print_servers(std::ostream &out) const;
     void print_placement(std::ostream &out) const;
+    void print_pool(std::ostream &out) const;
 
 	void add_server();
-    int find_place_inrow(size_t row, size_t width, int id);
-    Pair find_place(size_t row, size_t width, int id);
+    int find_place_inrow(size_t row, size_t width);
+    Pair find_place(size_t row, size_t width);
     void place_servers();
     void assign_pools();    
     void output_server_data(std::string outfile);

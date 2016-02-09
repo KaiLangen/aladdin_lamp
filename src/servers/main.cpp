@@ -23,13 +23,13 @@ int main(int argc, char * const argv[]){
 //    sf.print_placement(std::cout);
     std::cout << "assign pools" << std::endl;
     sf.assign_pools();
-
+    std::cout << "Print pools placement:"<< std::endl;
+    sf.print_pool(std::cout);
     std::cout << "output server data" << std::endl;
     sf.output_server_data("output.txt");
     std::cout << "calculate score" << std::endl;
     size_t score = sf.calc_score("output.txt");
 
-    sf.print_servers(std::cout);
     std::cout << " score = " << score << std::endl; 
 	return 0;
 }

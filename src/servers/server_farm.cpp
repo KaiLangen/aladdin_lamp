@@ -109,6 +109,7 @@ void ServerFarm::place_servers() {
     //std::sort(na_slots_.begin(), na_slots_.end(), Pair::cmp);
     
     size_t current_row = 0;
+    size_t unwrapped_row = 0;
     for (size_t s = 0; s < nservers_; s++) {
         Server * server = &servers_v_[s];
   std::cout << "Server: " << servers_v_[s];
@@ -116,17 +117,18 @@ void ServerFarm::place_servers() {
             // in case the server does not fit in current row R we move to next
             // until find place in the row F
             // and for next server has to start from row R until fitting except row F
-            Pair place = find_place(current_row % nrows_, server->width_);
-//  std::cout << "place: " << place; 
+            current_row = unwrapped_row % nrows_;
+            Pair place = find_place(current_row, server->width_);
+  std::cout << "cur row = " << current_row << " place: " << place ; 
             if (place.id_ >= 0) {
                 placement_[server->id_] = place;
                 server->row_ = place.id_;
                 server->slot_ = place.value_;
-                for (int i = 0; i< server->width_; i++) {
+                for (int i = 0; i < server->width_ ; i++) {
                     matrix_[place.id_][place.value_ + i] = server->id_ + 1;
                 }
                 if (place.id_ == current_row) {
-                    current_row++;
+                    unwrapped_row++;
                 }
             } else {
                 placement_[server->id_] = Pair(-1, -1);
@@ -138,15 +140,18 @@ void ServerFarm::place_servers() {
 
 void ServerFarm::assign_pools () {
     int cur_pool = 0;
+    std::sort(servers_v_.begin(), servers_v_.end(), Server::cmp_id); 
     for (int i = 0; i < nrows_; i++) {
         for (int j = 0; j < nslots_; j++) {
             int sid = matrix_[i][j] - 1;
-   //         std::cout << "i="<< i << " j=" << j << " val=" << val << std::endl;
-            if (matrix_[i][j] > 0) {
+            std::cout << "i="<< i << " j=" << j << " sid=" << sid <<  " cur_pool = " << cur_pool % npools_;
+            if (matrix_[i][j] >= 0) {
                 servers_v_[sid].pool_ = cur_pool % npools_;
                 cur_pool++;
-                j = j + servers_v_[sid].width_;
+                j = j + servers_v_[sid].width_ - 1;
+                std::cout << "    server =" << servers_v_[sid] << " new j = " << j << " new cur_pool = " << cur_pool % npools_;
             }
+            std::cout << std::endl;
         }
     }
 }
@@ -154,15 +159,16 @@ void ServerFarm::assign_pools () {
 void ServerFarm::output_server_data(std::string outfile){
     std::ofstream ofile(outfile.c_str());
     if(!ofile.is_open()){
-       std::cout<<"Unable to open output file"<<std::endl;
+       std::cout << "Unable to open output file"<<std::endl;
        exit(EXIT_FAILURE);
     }
+    std::sort(servers_v_.begin(), servers_v_.end(), Server::cmp_id); 
     for(size_t i = 0; i < nservers_; ++i){
         Server s = servers_v_[i];
         if(s.row_ >= 0)
-            ofile<<s.row_<<" "<<s.slot_<<" "<<s.pool_<<std::endl;
+            ofile << s.row_ << " " << s.slot_ << " " << s.pool_ << std::endl;
         else
-            ofile<<"x"<<std::endl;
+            ofile <<"x"<< std::endl;
     }
     ofile.close();
 }

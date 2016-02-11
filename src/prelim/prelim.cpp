@@ -104,8 +104,11 @@ void prelim::output_prelim_data (std::string outfile) {
 
 void prelim::deliver() {
     for (int t = 0; t < nturns_; t++) {
-        update_drones();
-        while (orders.size() and avail_drones_) {
+        for( std::vector<drone>::iterator it = drones.begin(), it != drones.end(), it++ ) {
+           update_drone(*it);
+        }
+
+        while (orders_left and avail_drones) {
             order cur_ord = choose_order();
             put_order(cur_ord);
         }
@@ -158,3 +161,31 @@ void prelim::load_drone (drone& cur_drone, order& cur_order) {
     }
 
 }
+
+void prelim::update_drone(drone& d) {
+
+    if ( d.turns_left_) {
+        d.turns_left_--;
+    } else if ( !d.immediate_pending_commands_.is_empty() ) {
+        command todo = d.immediate_pending_commands_.pop();
+        switch(todo.type_) {
+            case LOAD:
+                warehouses[todo.wid_] -= nitems_;
+                d.load[todo.pid_] += nitems_;
+                break;
+            case UNLOAD:
+                d.load[todo.pid_] -= nitems_;
+                orders[todo.oid_].delv_[todo.pid_] += nitems_; 
+                break;
+            case MOVE:
+                d.turns_left_ += pid_;
+                break;
+            default:
+                std::cerr << "Unrecognized command" << std::endl; 
+                exit(1);
+        }
+    }    
+}
+
+
+

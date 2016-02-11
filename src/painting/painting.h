@@ -41,7 +41,7 @@ public:
 	void paint_elems();
 	void paint_square();
 
-        void obvious_vertical_lines_optimization();
+        void obvious_squares_and_vertical_lines_optimization();
 
         void output_painting_data(std::string outfile);
 };

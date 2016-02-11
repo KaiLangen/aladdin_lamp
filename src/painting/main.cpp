@@ -13,7 +13,7 @@ int main(int argc, char * const argv[]){
         std::cout<<p<<std::endl;
         p.paint_horz_lines();
         p.paint_elems();
-        p.obvious_vertical_lines_optimization();
+        p.obvious_squares_and_vertical_lines_optimization();
 
         std::cout<<p.elem_remaining_<<std::endl;
 

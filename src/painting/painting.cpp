@@ -173,7 +173,7 @@ void painting::output_painting_data (std::string outfile) {
 }
 
 
-void painting::obvious_vertical_lines_optimization() {
+void painting::obvious_squares_and_vertical_lines_optimization() {
 
     // go through the list of operations
     std::list<operation>::iterator it;
@@ -187,7 +187,10 @@ void painting::obvious_vertical_lines_optimization() {
 
             // populate a list of lines of same length that are exactly underneath this one
             std::list< std::list<operation>::iterator > to_delete;
+
             std::list<operation>::iterator it_under = it;
+            to_delete.push_back(it_under);
+
             std::advance(it_under,1);
 
             while ( ( it_under =
@@ -209,9 +212,41 @@ void painting::obvious_vertical_lines_optimization() {
                 std::advance(it_under,1);
             }
 
-            // if the number of such lines is larger than the length of a single one, there is an optimization opportunity!
-            if ( to_delete.size() > length) {
+            // take into account the possibility to make a square instead
+            if ( length % 2 == 1 && to_delete.size() >= length && to_delete.size() < length*length && length >= 3 ) {
+
+                int s = (length - 1)/2;
+
                 std::cerr << "found an optimization opportunity at " << it->data_[0] << " " << it->data_[1] << std::endl;
+                std::cerr << "of height " << to_delete.size() << " and length " << length << std::endl;
+                std::cerr << ">>> making a square" << std::endl;
+                std::cerr << "of center " << it->data_[0] + s << " " << it->data_[1] + s << " and size " << s << std::endl;
+
+                operation tmp_square ( SQUARE, { it->data_[0] + s, it->data_[1] + s, s, -1 } );
+
+                op_list.push_back( tmp_square );
+
+                // remove from list of operations the first length operations
+                std::list< std::list<operation>::iterator >::iterator it_length;
+                it_length = to_delete.begin();
+                std::advance(it_length, length-1);
+
+                bool need_to_find_next_valid_iterator = true;
+                for (std::list< std::list<operation>::iterator >::iterator it_del = to_delete.begin(); it_del != it_length; it_del++ ) {
+                    std::list< operation >::iterator tmp_it;
+                    tmp_it = op_list.erase( *it_del );
+
+                    if ( need_to_find_next_valid_iterator && std::find( to_delete.begin(), to_delete.end(), tmp_it ) == to_delete.end() ) {
+                        it = tmp_it;
+                        need_to_find_next_valid_iterator = false;
+                    }
+                }
+            }
+            // if the number of such lines is larger than the length of a single one, there is an optimization opportunity!
+            // putting an else here should prevent from missing the opportunity of making multiple squares. To recheck
+            else if ( to_delete.size() > length) {
+                std::cerr << "found an optimization opportunity at " << it->data_[0] << " " << it->data_[1] << std::endl;
+                std::cerr << ">>> making a set of vertical lines" << std::endl;
                 std::cerr << " of height " << to_delete.size() << " and length " << length << std::endl;
                 // replace "many horizontal lines" with "few vertical lines"
 
@@ -223,9 +258,17 @@ void painting::obvious_vertical_lines_optimization() {
                     op_list.push_back( tmp );
                 }
 
-                std::for_each( to_delete.begin(), to_delete.end(),
-                  [&] ( std::list<operation>::iterator it_to_delete ) {
-                    op_list.erase( it_to_delete ); } );
+                bool need_to_find_next_valid_iterator = true;
+                for (std::list< std::list<operation>::iterator >::iterator it_del = to_delete.begin(); it_del != to_delete.end(); it_del++ ) {
+                    std::list< operation >::iterator tmp_it;
+                    tmp_it = op_list.erase( *it_del );
+
+                    if ( need_to_find_next_valid_iterator && std::find( to_delete.begin(), to_delete.end(), tmp_it ) == to_delete.end() ) {
+                        it = tmp_it;
+                        need_to_find_next_valid_iterator = false;
+                    }
+
+                }
             }
 
             to_delete.clear();

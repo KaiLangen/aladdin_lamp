@@ -1,0 +1,18 @@
+This is the directory for the competition, it includes:
+    make        - to build
+    main.cpp    - the main file used to build executable
+    prelim.h    - contains prelim and data class declarations
+    prelim.cpp  - contains a class with
+                    - constructor that takes an input file arg,
+                    - print/ostream functions (for prelim and data)
+                    - output_prelim_data function (outputs to file)
+                    - funct (empty functor)
+    input.txt   - an example of a potential input file
+
+To build an executable from this directory, simply input:
+	make
+
+this will generate a build subdirectory and an executable "./server"
+which takes no command line arguments.
+
+Please perform make clean before pushing to github(or make sure not to add build/executables).

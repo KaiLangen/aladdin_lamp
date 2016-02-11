@@ -18,6 +18,8 @@ prelim::prelim(std::string infile){
 		myfile >> max_payload_;
 		myfile >> nprods_;
 
+        avail_drones_ = ndrones_;
+
 		pweights.resize(nprods_);
 		for(int i = 0; i < nprods_; ++i){
 			myfile >> pweights[i];
@@ -100,10 +102,10 @@ void prelim::output_prelim_data (std::string outfile) {
 }
 
 
-void preim::deliver() {
+void prelim::deliver() {
     for (int t = 0; t < nturns_; t++) {
         update_drones();
-        while (orders_left and avail_drones) {
+        while (orders.size() and avail_drones_) {
             order cur_ord = choose_order();
             put_order(cur_ord);
         }
@@ -117,10 +119,42 @@ order& prelim::choose_order() {
 
 }
 
-void prelim::put_order (order & cur_order) {
-    while (avail_drones)
-    drone = choose_drone();
+drone& prelim::choose_drone() {
+    int rn = rand() % drones.size();
+    while (!drones[rn].counter) {
+        rn = rand() % drones.size();
+    }
+    return drones[rn];
 
-    load_commands(drone);
-    update_order();
+}
+
+void prelim::put_order (order & cur_order) {
+    while (avail_drones_ and cur_order.nitems_) {
+        drone& cur_drone  = choose_drone();
+        
+    load_drone(cur_drone, cur_order);
+    avail_drones_ --;
+//    update_order();
+    }
+}
+
+void prelim::load_drone (drone& cur_drone, order& cur_order) {
+    while (cur_drone.cap_ > 0 ) {
+        // iterate over products in the order
+        for (int it = 0; it < cur_order.req_.size(); it++) {
+            int itnum = cur_order.req_[it];
+            // reduce number of items of the product until it fits the drone 
+            while (itnum * pweights[it] > max_payload_ - cur_drone. and itnum > 1) {
+                itnum--;
+            }
+            // if at least 1 item left
+            if (itnum) {
+                 cur_drone.cup_ -= itnum * pweights[it];
+            }
+        }
+       choose_item();
+       choose_warehouse(); 
+       load_commands();
+    }
+
 }

@@ -67,6 +67,9 @@ public:
 	int nprods_;
 	int nwarehouses_;
 	int norders_;
+    
+    int avail_drones_;
+
 	std::vector<int> pweights;
 	std::vector<wh> warehouses;
 	std::vector<drone> drones;
@@ -79,6 +82,12 @@ public:
 	void print(std::ostream &out) const;
 
 	void output_prelim_data(std::string outfile);
+
+    void deliver();
+    order& choose_order();
+    drone& choose_drone();
+    void put_order (order & cur_order);
+    void load_drone (drone& cur_drone, order& cur_order);
 };
 
 std::ostream &operator<<(std::ostream &out, const prelim &p);

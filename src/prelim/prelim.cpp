@@ -117,6 +117,10 @@ order& prelim::choose_order() {
 
 }
 
-void prelim::put_order () {
+void prelim::put_order (order & cur_order) {
+    while (avail_drones)
+    drone = choose_drone();
 
+    load_commands(drone);
+    update_order();
 }

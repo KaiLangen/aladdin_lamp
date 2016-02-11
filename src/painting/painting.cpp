@@ -20,10 +20,10 @@ painting::painting(std::string infile){
                     working_matrix_[i].resize(ncols_);
 		    starting_matrix_[i].resize(ncols_);
                 }
-                
-		getline(myfile, line); 
+
+		getline(myfile, line);
 		for(int i = 0; i < nrows_; ++i){
-		    getline(myfile, line); 
+		    getline(myfile, line);
 		    for(int j = 0; j < ncols_; ++j){
 			if(line[j] == '#'){
 			   working_matrix_[i][j] = true;
@@ -171,5 +171,69 @@ void painting::output_painting_data (std::string outfile) {
     }
 
 }
+
+
+void painting::obvious_vertical_lines_optimization() {
+
+    // go through the list of operations
+    std::list<operation>::iterator it;
+    for( it = op_list.begin(); it != op_list.end(); it++){
+
+    // when you find a horizontal line
+        if ( (it->name_ == LINE) && ( it->data_[0] == it->data_[2] ) ) {
+
+            int length = it->data_[3] - it->data_[1] + 1;
+            int last_row_position = it->data_[0]; // this will be useful later
+
+            // populate a list of lines of same length that are exactly underneath this one
+            std::list< std::list<operation>::iterator > to_delete;
+            std::list<operation>::iterator it_under = it;
+            std::advance(it_under,1);
+
+            while ( ( it_under =
+              std::find_if( it_under, op_list.end(),
+                        [&] (operation op) {
+                          if (
+                          ( op.name_ == LINE ) &&
+                          ( op.data_[0] == op.data_[2] ) &&
+                          ( op.data_[0] == last_row_position + 1 ) &&
+                          ( op.data_[1] == it->data_[1] ) &&
+                          ( op.data_[3] == it->data_[3] ) ) {
+                            return true;
+                          } else { return false; }
+                          } )
+                     ) != op_list.end() ){
+
+                to_delete.push_back(it_under);
+                last_row_position = it_under->data_[0];
+                std::advance(it_under,1);
+            }
+
+            // if the number of such lines is larger than the length of a single one, there is an optimization opportunity!
+            if ( to_delete.size() > length) {
+                std::cerr << "found an optimization opportunity at " << it->data_[0] << " " << it->data_[1] << std::endl;
+                std::cerr << " of height " << to_delete.size() << " and length " << length << std::endl;
+                // replace "many horizontal lines" with "few vertical lines"
+
+                for( int i = 0; i < length; ++i) {
+                    operation tmp(LINE, { it->data_[0],
+                                          it->data_[1] + i,
+                                          last_row_position,
+                                          it->data_[1] + i } );
+                    op_list.push_back( tmp );
+                }
+
+                std::for_each( to_delete.begin(), to_delete.end(),
+                  [&] ( std::list<operation>::iterator it_to_delete ) {
+                    op_list.erase( it_to_delete ); } );
+            }
+
+            to_delete.clear();
+
+        }
+    }
+}
+
+
 
 

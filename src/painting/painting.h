@@ -23,12 +23,12 @@ struct operation {
 class painting {
 private:
 	std::vector<std::vector<bool> > working_matrix_;
-        std::list<operation> op_list;
 public:
 	int nrows_;
 	int ncols_;
 	std::vector<std::vector<bool> > starting_matrix_;
         int elem_remaining_;
+        std::list<operation> op_list;
 
 	painting(std::string filename);
 
@@ -40,6 +40,8 @@ public:
 	void paint_horz_lines();
 	void paint_elems();
 	void paint_square();
+
+        void obvious_vertical_lines_optimization();
 
         void output_painting_data(std::string outfile);
 };

@@ -36,7 +36,8 @@ struct drone {
 	coord pos_;
 	int cap_;
 	std::vector<int> load_;
-	std::vector<command> commands_;
+	std::vector<command> commands_history_;
+        std::queue<command> immediate_pending_commands_;
 
 	drone(int cap, coord pos){
 		//start at the 0th warehouse
@@ -45,6 +46,7 @@ struct drone {
 	}
 
 	void add_command();
+        
 };
 
 struct order {

@@ -102,7 +102,8 @@ void prelim::output_prelim_data (std::string outfile) {
 
 void preim::deliver() {
     for (int t = 0; t < nturns_; t++) {
-        update_drones();
+        std::foreach(drones.begin(), drones.end(), drone::update() );
+
         while (orders_left and avail_drones) {
             order cur_ord = choose_order();
             put_order(cur_ord);
@@ -120,3 +121,12 @@ order& prelim::choose_order() {
 void prelim::put_order () {
 
 }
+
+void drone::update() {
+
+    
+
+}
+
+
+

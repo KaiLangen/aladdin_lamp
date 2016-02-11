@@ -46,6 +46,8 @@ struct drone {
 	}
 
 	void add_command();
+
+        void update();
         
 };
 

@@ -100,5 +100,23 @@ void prelim::output_prelim_data (std::string outfile) {
 }
 
 
+void preim::deliver() {
+    for (int t = 0; t < nturns_; t++) {
+        update_drones();
+        while (orders_left and avail_drones) {
+            order cur_ord = choose_order();
+            put_order(cur_ord);
+        }
+    }
+}
 
 
+order& prelim::choose_order() {
+    int rn = rand() % orders.size();
+    return orders[rn];
+
+}
+
+void prelim::put_order () {
+
+}

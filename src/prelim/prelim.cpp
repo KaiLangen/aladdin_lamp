@@ -144,19 +144,22 @@ void prelim::put_order (order & cur_order) {
 void prelim::load_drone (drone& cur_drone, order& cur_order) {
     while (cur_drone.cap_ > 0 ) {
         // iterate over products in the order
-        for (int it = 0; it < cur_order.req_.size(); it++) {
-            int itnum = cur_order.req_[it];
-            // reduce number of items of the product until it fits the drone 
-            while (itnum * pweights[it] > max_payload_ - cur_drone. and itnum > 1) {
+        for (int prod = 0; prod < cur_order.req_.size(); prod++) {
+            int itnum = cur_order.req_[prod];
+            // reduce number of items of the product until prodfits the drone 
+            while (itnum * pweights[prod] > max_payload_ - cur_drone. and itnum > 1) {
                 itnum--;
             }
             // if at least 1 item left
+
+            choose_warehouse(itnum, product); 
             if (itnum) {
                  cur_drone.cup_ -= itnum * pweights[it];
             }
+            // change order: reduce number of items
+            cur_order.req_[it] -= itnum;
         }
        choose_item();
-       choose_warehouse(); 
        load_commands();
     }
 

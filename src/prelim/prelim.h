@@ -9,9 +9,16 @@
 #include <queue>
 #include <list>
 #include <cstddef>
+#include <limits>
 #include <cstdlib>
+#include <stdlib.h>
+#include <algorithm>
 #include <deque>
-enum command_type {LOAD, UNLOAD};
+
+class prelim;
+class command;
+
+enum command_type {LOAD, UNLOAD, DELIVER, WAIT};
 
 struct command{
 	int did_;
@@ -19,6 +26,8 @@ struct command{
 	int wid_;
 	int pid_;
 	int nitems_;
+	command(int did, command_type type, int wid, int pid, int num):
+	did_(did), type_(type), wid_(wid), pid_(pid), nitems_(num){};
 	void print(std::ostream &out) const;
 };
 
@@ -33,18 +42,17 @@ struct wh {
 };
 
 struct drone {
-	coord pos_;
 	int cap_;
-	std::vector<int> load_;
+	int turns_left_;
+	coord pos_;
+	int id_;
 	std::vector<command> commands_;
 
-	drone(int cap, coord pos){
-		//start at the 0th warehouse
-		pos_ = pos;
-		cap_ = cap;
-	}
+	drone(int cap, int time, coord pos, int id):
+		cap_(cap),turns_left_(time),pos_(pos),id_(id){}
 
-	void add_command();
+	void add_op(int did, command_type type, int wid, int pid, int num);
+	void action(int order_num, prelim& p);
 };
 
 struct order {
@@ -66,6 +74,7 @@ public:
 	std::vector<int> pweights;
 	std::vector<wh> warehouses;
 	std::vector<drone> drones;
+	std::vector<drone> dead_drones;
 	std::vector<order> orders;
 
 	prelim(std::string filename);
@@ -75,8 +84,10 @@ public:
 	void print(std::ostream &out) const;
 
 	void output_prelim_data(std::string outfile);
+
+	void master_command();
 };
 
-std::ostream &operator<<(std::ostream &out, const prelim &p);
+std::ostream &operator<<(std::ostream &out, const command& c);
 
 #endif

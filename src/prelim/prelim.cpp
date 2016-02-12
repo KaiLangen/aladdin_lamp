@@ -2,7 +2,9 @@
 #include <numeric>
 #include <string.h>
 #include <stdlib.h>
+#include <cassert>
 #include <stdio.h>
+#include <math.h>
 
 #include "prelim.h"
 prelim::prelim(std::string infile){
@@ -29,8 +31,10 @@ prelim::prelim(std::string infile){
 		for(int i = 0; i < nwarehouses_; ++i){
 			myfile >> warehouses[i].pos_.x_;
 			myfile >> warehouses[i].pos_.y_;
+			warehouses[i].av_.resize(nprods_);
 			for(int j = 0; j < nprods_; ++j){
 				myfile >> warehouses[i].av_[j];
+				//std::cout<<warehouses[i].av_[j]<<std::endl;
 			}
 		}
 
@@ -41,12 +45,15 @@ prelim::prelim(std::string infile){
 			myfile >> orders[i].pos_.x_;
 			myfile >> orders[i].pos_.y_;
 			myfile >> orders[i].nitems_;
+			orders[i].req_.resize(nprods_);
 			for(int j = 0; j < nprods_; ++j){
 				myfile >>orders[i].req_[j];
 			}
 		}
 		//initialize all the drones at warehouse 0 location
-		drones.resize(ndrones_, drone(max_payload_, warehouses[0].pos_));
+		for (int i = 0; i < ndrones_; ++i){
+			drones.push_back(drone(max_payload_, nturns_, warehouses[0].pos_,i));
+		}
 		myfile.close();
 	}
 	else{
@@ -55,40 +62,112 @@ prelim::prelim(std::string infile){
 	}
 }
 
+int distance(coord a, coord b){
+	int result = sqrt(pow((a.x_ - b.x_),2) + pow((a.x_ - b.x_),2));
+	result += 1;
+	return result;
+}
+
+void prelim::master_command(){
+	for(int i = 0; i < norders_; ++i){
+		while(drones.size()){
+			drones.back().action(i, *this);
+			dead_drones.push_back(drones.back());
+			drones.pop_back();
+		}
+	}
+}
+
+void drone::action(int order_num, prelim& p){
+	order o = p.orders[order_num];
+	//randomly select order
+	//start by order of orders
+
+	//execute order
+	for(size_t i = 0; i < o.req_.size(); ++i){
+
+	//search warehouse database for items you need
+		int dist = std::numeric_limits<int>::max();
+		wh closest = p.warehouses[0];
+		int wid;
+		for(int j = 0; j < p.nwarehouses_; ++j){
+			wh cur = p.warehouses[j];
+			//if warehouse contains product
+			if(cur.av_[i] > 0){
+				//if distance to cur is less than distance
+				int d = distance(pos_, cur.pos_);
+				if(d < dist){
+					dist= d;
+					closest = cur;
+					wid = j;
+				}
+			}
+		}
+		//go to nearest warehouse
+		turns_left_ -= dist;
+		pos_ = closest.pos_;
+		//load
+		turns_left_ -= 1;
+		int can_carry = 0;
+		if(turns_left_ > 0){
+			int required = o.req_[i];
+			can_carry = cap_ / (p.pweights[i]);
+			can_carry = std::min(required, can_carry);
+			add_op(id_, LOAD, wid, i, can_carry);
+		}
+		else{
+			break;
+		}
+		//go to destination
+		dist = distance(pos_, o.pos_);
+		turns_left_ -= dist;
+
+		//deliver
+		add_op(id_, LOAD, order_num, i, can_carry);
+	}
+}
+
+void drone::add_op(int did, command_type type,
+int wid, int pid, int num){
+	command c(did, type, wid, pid, num);
+	std::cout<<c<<std::endl;
+	commands_.push_back(c);
+}
+
 prelim::~prelim(){
 }
 
 void command::print(std::ostream &out) const{
-	out << did_;
+	out << did_<<" ";
 	if(type_ == LOAD)
-		out << "L";
+		out << "L ";
 	else if(type_ == UNLOAD)
-		out << "U";
+		out << "U ";
+	else if(type_ == DELIVER)
+		out << "D ";
+	else if(type_ == WAIT)
+		out << "W ";
 	else{
-		std::cout<<"INVALID COMMAND TYPE"<<std::endl;
+		std::cout<<"INVALID COMMAND TYPE: "<<type_<<std::endl;
 		exit(EXIT_FAILURE);
 	}
-	out << wid_;
-	out << pid_;
-	out << nitems_;
+	out << wid_<<" ";
+	out << pid_<<" ";
+	out << nitems_<<" ";
 }
 
-std::ostream &operator<<(std::ostream &out, const command &c){
+std::ostream &operator<<(std::ostream &out, const command& c){
 	c.print(out);
 	return out;
 }
 
-void drone::add_command(){
-
-}
-
-
 void prelim::output_prelim_data (std::string outfile) {
     std::ofstream ofile(outfile.c_str());
     if(ofile.is_open()){
+		assert(dead_drones.size() == static_cast<size_t>(ndrones_));
         for(int i = 0; i < ndrones_; ++i){
-			for(size_t j = 0; j < drones[i].commands_.size(); ++j){
-				ofile << drones[i].commands_[j] << std::endl;
+			for(size_t j = 0; j < dead_drones[i].commands_.size(); ++j){
+				ofile << dead_drones[i].commands_[j] << std::endl;
 			}
         }
         ofile.close();

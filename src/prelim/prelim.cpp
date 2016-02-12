@@ -79,23 +79,23 @@ void prelim::master_command(){
 }
 
 void drone::action(int order_num, prelim& p){
-	order o = p.orders[order_num];
+	order *o = &(p.orders[order_num]);
 	//randomly select order
 	//start by order of orders
 
 	//execute order
-	for(size_t i = 0; i < o.req_.size(); ++i){
+	for(size_t i = 0; i < o->req_.size(); ++i){
 
 	//search warehouse database for items you need
 		int dist = std::numeric_limits<int>::max();
-		wh closest = p.warehouses[0];
+		wh* closest = NULL;
 		int wid;
 		for(int j = 0; j < p.nwarehouses_; ++j){
-			wh cur = p.warehouses[j];
+			wh* cur = &(p.warehouses[j]);
 			//if warehouse contains product
-			if(cur.av_[i] > 0){
+			if(cur->av_[i] > 0){
 				//if distance to cur is less than distance
-				int d = distance(pos_, cur.pos_);
+				int d = distance(pos_, cur->pos_);
 				if(d < dist){
 					dist= d;
 					closest = cur;
@@ -104,22 +104,22 @@ void drone::action(int order_num, prelim& p){
 			}
 		}
 		//go to nearest warehouse
-		turns_left_ -= dist;
-		pos_ = closest.pos_;
 		//load
 		turns_left_ -= 1;
 		int can_carry = 0;
-		if(turns_left_ > 0){
-			int required = o.req_[i];
-			can_carry = cap_ / (p.pweights[i]);
-			can_carry = std::min(required, can_carry);
-			add_op(id_, LOAD, wid, i, can_carry);
-		}
-		else{
+		turns_left_ -= dist;
+		if(!(turns_left_ > 0 && closest)){
 			break;
 		}
+		pos_ = closest->pos_;
+		int required = o->req_[i];
+		can_carry = cap_ / (p.pweights[i]);
+		can_carry = std::min(required, can_carry);
+		add_op(id_, LOAD, wid, i, can_carry);
+		closest->av_[i] -= can_carry;
+		o->req_[i] -= can_carry;
 		//go to destination
-		dist = distance(pos_, o.pos_);
+		dist = distance(pos_, o->pos_);
 		turns_left_ -= dist;
 
 		//deliver

@@ -1,11 +1,10 @@
-#include "prelim.h"
 #include <algorithm>
 #include <numeric>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-const std::string data::hw_("HELLO WORLD");
 
+#include "prelim.h"
 prelim::prelim(std::string infile){
 	srand(time(NULL));
 	std::string line;
@@ -19,34 +18,32 @@ prelim::prelim(std::string infile){
 		myfile >> max_payload_;
 		myfile >> nprods_;
 
-		int weight;
+		pweights.resize(nprods_);
 		for(int i = 0; i < nprods_; ++i){
-			myfile >> weight;
-			//do something with that weight
-			std::cout<<weight<<std::endl;
+			myfile >> pweights[i];
 		}
+
 		myfile >> nwarehouses_;
-		//discard the first 4 lines
-		getline(myfile, line);
-		getline(myfile, line);
-		getline(myfile, line);
-		getline(myfile, line);
+		warehouses.resize(nwarehouses_);
 
 		for(int i = 0; i < nwarehouses_; ++i){
-			//get two lines per warehouse
-			getline(myfile, line);
-			getline(myfile, line);
+			myfile >> warehouses[i].pos_.x_;
+			myfile >> warehouses[i].pos_.y_;
+			for(int j = 0; j < nprods_; ++j){
+				myfile >> warehouses[i].av_[j];
+			}
 		}
 
 		//get number of orders
-		getline(myfile, line);
-		//norders_;
-
+		myfile >> norders_;
+		orders.resize(norders_);
 		for(int i = 0; i < norders_; ++i){
-			//get 3 lines per order
-			getline(myfile, line);
-			getline(myfile, line);
-			getline(myfile, line);
+			myfile >> orders[i].pos_.x_;
+			myfile >> orders[i].pos_.y_;
+			myfile >> orders[i].nitems_;
+			for(int j = 0; j < nprods_; ++j){
+				myfile >>orders[i].req_[j];
+			}
 		}
 
 		myfile.close();

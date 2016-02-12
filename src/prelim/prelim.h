@@ -11,39 +11,40 @@
 #include <cstddef>
 #include <cstdlib>
 #include <deque>
+enum command_type {LOAD UNLOAD};
 
-typedef enum {} e;
+struct command{
+	int did_;
+	command_type type_;
+	int wid_;
+	int pid_;
+	int nitems_;
+};
 
 struct coord{
 	int x_;
 	int y_;
-}
+};
 
 struct wh {
 	coord pos_;
 	std::vector<int> av_;
 };
 
-struct prod {
-	int id_;
-	int weight_;
-};
-
 struct drone {
 	coord pos_;
 	int cap_;
 	std::vector<int> load_;
-
+	std::vector<command> commands_;
 };
 
 struct order {
 	coord pos_;
+	int nitems_;
 	std::vector<int> req_;
 };
 
 class prelim {
-private:
-	std::vector<std::vector<data> > matrix_;
 public:
 	int nrows_;
 	int ncols_;
@@ -53,6 +54,9 @@ public:
 	int nprods_;
 	int nwarehouses_;
 	int norders_;
+	std::vector<int> pweights;
+	std::vector<wh> warehouses;
+	std::vector<order> orders;
 
 	prelim(std::string filename);
 
@@ -64,7 +68,5 @@ public:
 };
 
 std::ostream &operator<<(std::ostream &out, const prelim &p);
-
-std::ostream &operator<<(std::ostream &out, const data &d);
 
 #endif

@@ -11,7 +11,7 @@
 #include <cstddef>
 #include <cstdlib>
 #include <deque>
-enum command_type {LOAD UNLOAD};
+enum command_type {LOAD, UNLOAD};
 
 struct command{
 	int did_;
@@ -19,6 +19,7 @@ struct command{
 	int wid_;
 	int pid_;
 	int nitems_;
+	void print(std::ostream &out) const;
 };
 
 struct coord{
@@ -56,6 +57,7 @@ public:
 	int norders_;
 	std::vector<int> pweights;
 	std::vector<wh> warehouses;
+	std::vector<drone> drones;
 	std::vector<order> orders;
 
 	prelim(std::string filename);

@@ -3,7 +3,6 @@
 
 int main(int argc, char * const argv[]){
         prelim p("input.txt");
-        std::cout<<p<<std::endl;
 
         p.output_prelim_data("output.txt");
 

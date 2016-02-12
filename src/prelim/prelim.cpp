@@ -14,6 +14,7 @@ prelim::prelim(std::string infile){
 		myfile >> nrows_;
 		myfile >> ncols_;
 		myfile >> ndrones_;
+		drones.resize(ndrones_);
 		myfile >> nturns_;
 		myfile >> max_payload_;
 		myfile >> nprods_;
@@ -57,30 +58,33 @@ prelim::prelim(std::string infile){
 prelim::~prelim(){
 }
 
-void prelim::print(std::ostream &out) const{
-    for(int i = 0; i < nrows_; ++i){
-        for(int j = 0; j < ncols_; ++j){
-//	   out<<matrix_[i][j]<<std::endl;
-        }
-        out<<std::endl;
-    }
-
+void command::print(std::ostream &out) const{
+	out << did_;
+	if(type_ == LOAD)
+		out << "L";
+	else if(type_ == UNLOAD)
+		out << "U";
+	else{
+		std::cout<<"INVALID COMMAND TYPE"<<std::endl;
+		exit(EXIT_FAILURE);
+	}
+	out << wid_;
+	out << pid_;
+	out << nitems_;
 }
 
-std::ostream &operator<<(std::ostream &out, const prelim &s){
-	s.print(out);
+std::ostream &operator<<(std::ostream &out, const command &c){
+	c.print(out);
 	return out;
 }
 
 void prelim::output_prelim_data (std::string outfile) {
     std::ofstream ofile(outfile.c_str());
     if(ofile.is_open()){
-        //print something
-        ofile << "something" << std::endl;
-        //print other things
-        char ot[] = {"other things"};
-        for(int i = 0; i < 12; ++i){
-            ofile << ot[i] << std::endl;
+        for(int i = 0; i < ndrones_; ++i){
+			for(size_t j = 0; j < drones[i].commands_.size(); ++j){
+				ofile << drones[i].commands_[j] << std::endl;
+			}
         }
         ofile.close();
     }

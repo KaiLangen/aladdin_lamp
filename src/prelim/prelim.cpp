@@ -14,20 +14,41 @@ prelim::prelim(std::string infile){
                 //get single items from input file
 		myfile >> nrows_;
 		myfile >> ncols_;
+		myfile >> ndrones_;
+		myfile >> nturns_;
+		myfile >> max_payload_;
+		myfile >> nprods_;
 
-		matrix_.resize(nrows_);
-                for(int i = 0; i < nrows_; ++i){
-                    matrix_[i].resize(ncols_);
-                }
-
-                //discard the first line
-		getline(myfile, line);
-                //get entire lines at a time
-		for(int i = 0; i < nrows_; ++i){
-		    getline(myfile, line);
-                    //do something with that line
-                    std::cout<<line<<std::endl;
+		int weight;
+		for(int i = 0; i < nprods_; ++i){
+			myfile >> weight;
+			//do something with that weight
+			std::cout<<weight<<std::endl;
 		}
+		myfile >> nwarehouses_;
+		//discard the first 4 lines
+		getline(myfile, line);
+		getline(myfile, line);
+		getline(myfile, line);
+		getline(myfile, line);
+
+		for(int i = 0; i < nwarehouses_; ++i){
+			//get two lines per warehouse
+			getline(myfile, line);
+			getline(myfile, line);
+		}
+
+		//get number of orders
+		getline(myfile, line);
+		//norders_;
+
+		for(int i = 0; i < norders_; ++i){
+			//get 3 lines per order
+			getline(myfile, line);
+			getline(myfile, line);
+			getline(myfile, line);
+		}
+
 		myfile.close();
 	}
 	else{
@@ -42,24 +63,15 @@ prelim::~prelim(){
 void prelim::print(std::ostream &out) const{
     for(int i = 0; i < nrows_; ++i){
         for(int j = 0; j < ncols_; ++j){
-	   out<<matrix_[i][j]<<std::endl;
+//	   out<<matrix_[i][j]<<std::endl;
         }
         out<<std::endl;
     }
 
 }
 
-void data::print(std::ostream &out) const{
-    out<<hw_;
-}
-
 std::ostream &operator<<(std::ostream &out, const prelim &s){
 	s.print(out);
-	return out;
-}
-
-std::ostream &operator<<(std::ostream &out, const data &d){
-	d.print(out);
 	return out;
 }
 

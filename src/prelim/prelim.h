@@ -10,12 +10,35 @@
 #include <list>
 #include <cstddef>
 #include <cstdlib>
+#include <deque>
 
 typedef enum {} e;
 
-struct data {
-    static const std::string hw_;
-    void print(std::ostream &out) const;
+struct coord{
+	int x_;
+	int y_;
+}
+
+struct wh {
+	coord pos_;
+	std::vector<int> av_;
+};
+
+struct prod {
+	int id_;
+	int weight_;
+};
+
+struct drone {
+	coord pos_;
+	int cap_;
+	std::vector<int> load_;
+
+};
+
+struct order {
+	coord pos_;
+	std::vector<int> req_;
 };
 
 class prelim {
@@ -24,6 +47,12 @@ private:
 public:
 	int nrows_;
 	int ncols_;
+	int ndrones_;
+	int nturns_;
+	int max_payload_;
+	int nprods_;
+	int nwarehouses_;
+	int norders_;
 
 	prelim(std::string filename);
 
@@ -31,7 +60,7 @@ public:
 
 	void print(std::ostream &out) const;
 
-        void output_prelim_data(std::string outfile);
+	void output_prelim_data(std::string outfile);
 };
 
 std::ostream &operator<<(std::ostream &out, const prelim &p);

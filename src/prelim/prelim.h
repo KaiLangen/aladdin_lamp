@@ -37,6 +37,14 @@ struct drone {
 	int cap_;
 	std::vector<int> load_;
 	std::vector<command> commands_;
+
+	drone(int cap, coord pos){
+		//start at the 0th warehouse
+		pos_ = pos;
+		cap_ = cap;
+	}
+
+	void add_command();
 };
 
 struct order {

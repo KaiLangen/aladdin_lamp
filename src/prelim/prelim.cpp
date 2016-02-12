@@ -14,7 +14,6 @@ prelim::prelim(std::string infile){
 		myfile >> nrows_;
 		myfile >> ncols_;
 		myfile >> ndrones_;
-		drones.resize(ndrones_);
 		myfile >> nturns_;
 		myfile >> max_payload_;
 		myfile >> nprods_;
@@ -46,7 +45,8 @@ prelim::prelim(std::string infile){
 				myfile >>orders[i].req_[j];
 			}
 		}
-
+		//initialize all the drones at warehouse 0 location
+		drones.resize(ndrones_, drone(max_payload_, warehouses[0].pos_));
 		myfile.close();
 	}
 	else{
@@ -77,6 +77,11 @@ std::ostream &operator<<(std::ostream &out, const command &c){
 	c.print(out);
 	return out;
 }
+
+void drone::add_command(){
+
+}
+
 
 void prelim::output_prelim_data (std::string outfile) {
     std::ofstream ofile(outfile.c_str());

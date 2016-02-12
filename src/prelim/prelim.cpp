@@ -113,8 +113,10 @@ void drone::action(int order_num, prelim& p){
 		}
 		pos_ = closest->pos_;
 		int required = o->req_[i];
+		int available = closest->av_[i];
 		can_carry = cap_ / (p.pweights[i]);
 		can_carry = std::min(required, can_carry);
+		can_carry = std::min(available, can_carry);
 		add_op(id_, LOAD, wid, i, can_carry);
 		closest->av_[i] -= can_carry;
 		o->req_[i] -= can_carry;
@@ -165,7 +167,12 @@ void prelim::output_prelim_data (std::string outfile) {
     std::ofstream ofile(outfile.c_str());
     if(ofile.is_open()){
 		assert(dead_drones.size() == static_cast<size_t>(ndrones_));
-        for(int i = 0; i < ndrones_; ++i){
+		size_t sum = 0;
+		for(int i = 0; i < ndrones_; ++i){
+				sum += dead_drones[i].commands_.size();
+		}
+
+		for(int i = 0; i < ndrones_; ++i){
 			for(size_t j = 0; j < dead_drones[i].commands_.size(); ++j){
 				ofile << dead_drones[i].commands_[j] << std::endl;
 			}
